@@ -23,12 +23,6 @@ A web-based 3D audio visualizer!
   - Reset view option
   - Orbit controls
 
-- **Audio Features**
-  - Upload custom audio files
-  - Built-in demo song
-  - Play/pause functionality
-  - Real-time frequency spectrum display
-
 - **Preset Configurations**
   - Energetic
   - Chill

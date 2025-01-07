@@ -1,0 +1,349 @@
+:root {
+    --background: hsl(0 0% 3.9%);
+    --foreground: hsl(0 0% 98%);
+    --primary: hsl(142.1 76.2% 36.3%);
+    --primary-hover: hsl(142.1 76.2% 32.3%);
+    --secondary: hsl(217, 91%, 60%);
+    --secondary-hover: hsl(217, 91%, 55%);
+    --muted: hsl(0 0% 15%);
+    --muted-foreground: hsl(0 0% 63.9%);
+    --border: hsl(0 0% 14.9%);
+    --radius: 0.5rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--background);
+    color: var(--foreground);
+}
+
+#visualizer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+#visualizer:active {
+    cursor: grabbing;
+}
+
+.controls-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+.controls-wrapper.hidden {
+    transform: translateX(340px);
+}
+
+
+
+#controls {
+    background: var(--background);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.show-ui-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 90;
+}
+
+.show-ui-button.visible {
+    opacity: 1;
+}
+
+.control-group {
+    margin-bottom: 1.5rem;
+}
+
+.control-group:last-child {
+    margin-bottom: 0;
+}
+
+.control-header {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    background: var(--muted);
+    border-radius: var(--radius);
+    appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--foreground);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+select {
+    width: 100%;
+    padding: 0.5rem;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--foreground);
+    font-size: 0.875rem;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+button {
+    background: var(--muted);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+button.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+button.primary:hover {
+    background: var(--primary-hover);
+}
+
+button.secondary {
+    background: var(--secondary);
+    border-color: var(--secondary);
+}
+
+button.secondary:hover {
+    background: var(--secondary-hover);
+}
+
+#fileInput {
+    display: none;
+}
+
+.color-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+input[type="color"] {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--muted);
+    cursor: pointer;
+}
+
+.audio-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.camera-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    background: var(--background);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.spectrum-display {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: var(--background);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    width: 200px;
+}
+
+.frequency-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--muted);
+    margin-bottom: 4px;
+    border-radius: 2px;
+}
+
+.frequency-bar div {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.1s ease;
+}
+
+.preset-button {
+    background: var(--muted);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    margin: 0.25rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.preset-button:hover {
+    background: var(--primary);
+}
+
+.tooltip {
+    position: absolute;
+    background: var(--background);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.keybind-info {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--background);
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.tab {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .controls-wrapper {
+        width: 100%;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: translateY(100%);
+    }
+
+    .controls-wrapper.hidden {
+        transform: translateY(100%);
+    }
+
+    #controls {
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .show-ui-button {
+        top: auto;
+        bottom: 20px;
+    }
+
+    .camera-controls {
+        bottom: 80px;
+    }
+
+    .spectrum-display {
+        bottom: 80px;
+    }
+
+    .keybind-info {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .button-group,
+    .color-inputs,
+    .audio-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .preset-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .preset-button {
+        flex: 1 1 auto;
+        min-width: 80px;
+    }
+}
+

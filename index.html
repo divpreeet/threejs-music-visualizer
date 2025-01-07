@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Audio Visualizer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div id="visualizer"></div>
+    <button class="show-ui-button">Show UI</button>
+    
+    <!-- Spectrum Display -->
+    <div class="spectrum-display">
+        <div class="frequency-bar"><div></div></div>
+        <div class="frequency-bar"><div></div></div>
+        <div class="frequency-bar"><div></div></div>
+        <div class="frequency-bar"><div></div></div>
+        <div class="frequency-bar"><div></div></div>
+    </div>
+
+    <div class="keybind-info">
+        Press 'H' to toggle UI | Middle Mouse to rotate | Scroll to zoom
+    </div>
+
+    <div class="controls-wrapper">
+        <div id="controls">
+            <div class="tabs">
+                <div class="tab active" data-tab="visuals">Visuals</div>
+                <div class="tab" data-tab="audio">Audio</div>
+                <div class="tab" data-tab="camera">Camera</div>
+            </div>
+
+            <div class="control-group">
+                <button id="uploadButton" class="primary">Upload Audio</button>
+                <button id="demoSongButton">Use Demo Song</button>
+                <input type="file" id="fileInput" accept="audio/*">
+                <div class="audio-controls">
+                    <button id="playPauseButton">Play</button>
+                    <button id="resetButton">Reset</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Visualization Mode</label>
+                </div>
+                <select id="visualizationMode">
+                    <option value="bars">Bars</option>
+                    <option value="circles">Circles</option>
+                    <option value="wave">Wave</option>
+                    <option value="sphere">Sphere</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Elements Count: <span id="barsValue">32</span></label>
+                </div>
+                <input type="range" id="barsCount" min="16" max="128" value="32">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Height Scale: <span id="scaleValue">1</span></label>
+                </div>
+                <input type="range" id="heightScale" min="0.5" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Rotation Speed: <span id="rotationValue">0</span></label>
+                </div>
+                <input type="range" id="rotationSpeed" min="0" max="2" step="0.1" value="0">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Colors</label>
+                </div>
+                <div class="color-inputs">
+                    <input type="color" id="primaryColor" value="#00ff00">
+                    <input type="color" id="secondaryColor" value="#0000ff">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Presets</label>
+                </div>
+                <div class="preset-buttons">
+                    <button class="preset-button" data-preset="energetic">Energetic</button>
+                    <button class="preset-button" data-preset="chill">Chill</button>
+                    <button class="preset-button" data-preset="psychedelic">Psychedelic</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label>Equalizer</label>
+                </div>
+                <input type="range" id="bassBoost" min="0" max="2" step="0.1" value="1">
+                <input type="range" id="trebleBoost" min="0" max="2" step="0.1" value="1">
+            </div>
+
+            <div class="button-group">
+                <button id="fullscreenButton">Fullscreen</button>
+                <button id="toggleControls">Hide UI</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="camera-controls">
+        <button id="resetCamera">Reset View</button>
+        <button id="toggleOrbit">Toggle Orbit</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

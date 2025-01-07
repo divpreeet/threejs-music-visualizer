@@ -37,8 +37,9 @@ A web-based 3D audio visualizer!
 
 ## Requirements
 
-- Modern web browser with WebGL support
-- Web server for hosting files
-- Audio file in MP3 format for demo functionality
+- modern web browser with WebGL support
+- web server for hosting files
+- audio file in MP3 format for demo functionality
 
 ## Try It Out!
+[3D Audio Visualizer](https://divpreeet.github.io/threejs-music-visualizer/)

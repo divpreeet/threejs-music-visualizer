@@ -7,11 +7,10 @@ let primaryColor = 0x00ff00;
 let secondaryColor = 0x0000ff;
 let orbitControls;
 
-// Add these variables at the start of your file
-let audioBuffer = null;      // Store the decoded audio buffer
-let customAudioBuffer = null; // Store uploaded audio buffer
-let source = null;           // Current audio source
-let isDemo = false;          // Track if we're playing demo or custom audio
+let audioBuffer = null;      
+let customAudioBuffer = null; 
+let source = null;
+let isDemo = false;
 
 function init() {
     scene = new THREE.Scene();
@@ -26,7 +25,7 @@ function init() {
     scene.add(visualizer);
 
     initAudio();
-    loadDemoSong();  // Load the demo song
+    loadDemoSong(); 
     createVisualization();
     animate();
 
@@ -306,7 +305,7 @@ function applyPreset(preset) {
             break;
     }
 
-    // Trigger change events to update the visualization
+    //change events to update the visualization
     document.getElementById('visualizationMode').dispatchEvent(new Event('change'));
     document.getElementById('barsCount').dispatchEvent(new Event('input'));
     document.getElementById('heightScale').dispatchEvent(new Event('input'));
@@ -493,7 +492,7 @@ document.getElementById('demoSongButton').addEventListener('click', () => switch
 document.getElementById('uploadButton').addEventListener('click', () => switchAudio(false));
 
 
-// Initialize everything
+// init everything
 init();
 initMouseControls();
 updateFrequencyBars();

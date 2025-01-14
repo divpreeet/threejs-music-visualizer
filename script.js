@@ -11,13 +11,14 @@ let audioBuffer = null;
 let customAudioBuffer = null; 
 let source = null;
 let isDemo = false;
+let isLoading = true;
 
 function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('visualizer').appendChild(renderer.domElement);
 
@@ -39,6 +40,20 @@ function initAudio() {
     dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
+function initMicrophone() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            const micSource = audioContext.createMediaStreamSource(stream);
+            micSource.connect(analyser);
+            isPlaying = true;
+            document.getElementById('playPauseButton').textContent = 'Stop Mic';
+        })
+        .catch(err => {
+            console.error('Error accessing microphone:', err);
+            alert('Failed to access microphone. Please check your permissions.');
+        });
+}
+
 function loadDemoSong() {
     fetch('song.mp3')
         .then(response => {
@@ -54,10 +69,14 @@ function loadDemoSong() {
             audioBuffer = buffer;
             console.log('Demo song loaded successfully');
             document.getElementById('playPauseButton').textContent = 'Play Demo';
+            isLoading = false;
+            document.getElementById('loadingIndicator').style.display = 'none';
         })
         .catch(error => {
             console.error('Error loading demo song:', error);
             alert('Failed to load the demo song. Please ensure song.mp3 is in the correct location.');
+            isLoading = false;
+            document.getElementById('loadingIndicator').style.display = 'none';
         });
 }
 
@@ -76,7 +95,7 @@ function createVisualization() {
 function animate() {
     requestAnimationFrame(animate);
 
-    if (isPlaying) {
+    if (isPlaying && !isLoading) {
         analyser.getByteFrequencyData(dataArray);
 
         for (let i = 0; i < visualElements.length; i++) {
@@ -100,6 +119,20 @@ function animate() {
                     element.position.x = Math.cos(theta) * radius;
                     element.position.y = Math.sin(theta) * radius;
                     break;
+                case 'spiral':
+                    const angle = (i / visualElements.length) * Math.PI * 10;
+                    const spiralRadius = (i / visualElements.length) * 3 + (value / 256.0) * heightScale;
+                    element.position.x = Math.cos(angle) * spiralRadius;
+                    element.position.y = Math.sin(angle) * spiralRadius;
+                    element.position.z = (i / visualElements.length) * 5 - 2.5;
+                    break;
+                case 'fountain':
+                    const time = Date.now() * 0.001;
+                    const height = (value / 256.0) * heightScale * 3;
+                    element.position.y = Math.abs(Math.sin(time + i * 0.1)) * height;
+                    element.position.x = Math.cos(i * 0.2 + time) * (2 + height * 0.2);
+                    element.position.z = Math.sin(i * 0.2 + time) * (2 + height * 0.2);
+                    break;
             }
         }
 
@@ -122,25 +155,32 @@ document.getElementById('uploadButton').addEventListener('click', () => {
 document.getElementById('fileInput').addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (file) {
+        isLoading = true;
+        document.getElementById('loadingIndicator').style.display = 'block';
         const reader = new FileReader();
         reader.onload = (e) => {
             const arrayBuffer = e.target.result;
-            audioContext.decodeAudioData(arrayBuffer, (buffer) => {
-                if (source) {
-                    source.stop();
-                    source.disconnect();
-                }
-                customAudioBuffer = buffer;
-                source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                source.connect(analyser);
-                analyser.connect(audioContext.destination);
-                source.start(0);
-                isPlaying = true;
-                isDemo = false;
-                document.getElementById('playPauseButton').textContent = 'Pause';
-            });
+            audioContext.decodeAudioData(arrayBuffer)
+                .then((buffer) => {
+                    if (source) {
+                        source.stop();
+                        source.disconnect();
+                    }
+                    customAudioBuffer = buffer;
+                    source = audioContext.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                    source.start(0);
+                    isPlaying = true;
+                    isDemo = false;
+                    document.getElementById('playPauseButton').textContent = 'Pause';
+                    isLoading = false;
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                })
+                .catch(handleAudioLoadError);
         };
+        reader.onerror = handleAudioLoadError;
         reader.readAsArrayBuffer(file);
     }
 });
@@ -180,7 +220,6 @@ document.getElementById('resetButton').addEventListener('click', () => {
     isDemo = false;
     document.getElementById('playPauseButton').textContent = 'Play';
     
-    // Reset visualization
     visualElements.forEach(element => {
         element.scale.set(1, 1, 1);
         element.position.y = 0;
@@ -222,10 +261,12 @@ function updateVisualizationGeometry() {
     let geometry;
     switch (visualizationMode) {
         case 'bars':
+        case 'wave':
+        case 'spiral':
+        case 'fountain':
             geometry = new THREE.BoxGeometry(0.05, 1, 0.05);
             break;
         case 'circles':
-        case 'wave':
         case 'sphere':
             geometry = new THREE.SphereGeometry(0.025, 32, 32);
             break;
@@ -305,7 +346,6 @@ function applyPreset(preset) {
             break;
     }
 
-    //change events to update the visualization
     document.getElementById('visualizationMode').dispatchEvent(new Event('change'));
     document.getElementById('barsCount').dispatchEvent(new Event('input'));
     document.getElementById('heightScale').dispatchEvent(new Event('input'));
@@ -375,17 +415,17 @@ function updateFrequencyBars() {
 }
 
 function applyEqualizer() {
-    if (!audioContext) return;
+    if (!audioContext || !source) return;
 
     const bassBoost = parseFloat(document.getElementById('bassBoost').value);
     const trebleBoost = parseFloat(document.getElementById('trebleBoost').value);
 
-    const bassFilter = audioContext.createBiquadFilter();
+    let bassFilter = source.context.createBiquadFilter();
     bassFilter.type = 'lowshelf';
     bassFilter.frequency.value = 200;
     bassFilter.gain.value = (bassBoost - 1) * 10;
 
-    const trebleFilter = audioContext.createBiquadFilter();
+    let trebleFilter = source.context.createBiquadFilter();
     trebleFilter.type = 'highshelf';
     trebleFilter.frequency.value = 2000;
     trebleFilter.gain.value = (trebleBoost - 1) * 10;
@@ -486,13 +526,50 @@ function switchAudio(toDemo) {
     source = null;
     isPlaying = false;
     document.getElementById('playPauseButton').textContent = toDemo ? 'Play Demo' : 'Play';
+    visualElements.forEach(element => {
+        element.scale.set(1, 1, 1);
+        element.position.y = 0;
+    });
 }
 
 document.getElementById('demoSongButton').addEventListener('click', () => switchAudio(true));
 document.getElementById('uploadButton').addEventListener('click', () => switchAudio(false));
 
+document.getElementById('micButton').addEventListener('click', () => {
+    if (isPlaying) {
+        if (source) {
+            source.stop();
+            source.disconnect();
+            source = null;
+        }
+        isPlaying = false;
+        document.getElementById('playPauseButton').textContent = 'Play';
+    } else {
+        initMicrophone();
+    }
+});
 
-// init everything
+function handleAudioLoadError(error) {
+    console.error('Error loading audio:', error);
+    alert('Failed to load audio. Please try again or use a different file.');
+    isLoading = false;
+    document.getElementById('loadingIndicator').style.display = 'none';
+}
+
+function handleVisibilityChange() {
+    if (document.hidden) {
+        if (isPlaying) {
+            audioContext.suspend();
+        }
+    } else {
+        if (isPlaying) {
+            audioContext.resume();
+        }
+    }
+}
+
+document.addEventListener('visibilitychange', handleVisibilityChange);
+
 init();
 initMouseControls();
 updateFrequencyBars();

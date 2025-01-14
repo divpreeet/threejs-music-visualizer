@@ -51,8 +51,6 @@ body {
     transform: translateX(340px);
 }
 
-
-
 #controls {
     background: var(--background);
     padding: 1.5rem;
@@ -120,6 +118,18 @@ input[type="range"]::-webkit-slider-thumb {
     cursor: pointer;
 }
 
+input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--primary);
+    height: 8px;
+    border-radius: 4px;
+}
+
+input[type="range"]::-moz-range-track {
+    background: var(--primary);
+    height: 8px;
+    border-radius: 4px;
+}
+
 select {
     width: 100%;
     padding: 0.5rem;
@@ -151,6 +161,10 @@ button {
 button:hover {
     background: var(--primary);
     border-color: var(--primary);
+}
+
+button:active {
+    transform: translateY(1px);
 }
 
 button.primary {
@@ -191,9 +205,14 @@ input[type="color"] {
 }
 
 .audio-controls {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-top: 1rem;
+}
+
+.audio-controls button {
+    width: 100%;
 }
 
 .camera-controls {
@@ -345,5 +364,22 @@ input[type="color"] {
         flex: 1 1 auto;
         min-width: 80px;
     }
+}
+
+.loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: var(--foreground);
+    background-color: var(--background);
+    padding: 1rem;
+    border-radius: var(--radius);
+    z-index: 1000;
+}
+
+#visualizer canvas {
+    transition: background-color 0.3s ease;
 }
 
